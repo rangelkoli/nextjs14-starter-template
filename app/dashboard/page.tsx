@@ -1,42 +1,58 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChartComponent } from './(components)/BarChart'
+import MiniCalendar from "@/components/MiniCalendar";
+import React, { ChangeEvent, useRef } from "react";
+import WeeklyOverview from "@/components/WeeklyOverview";
+import Checkbox from "@/components/Checkbox";
+import AISchedule from "@/components/WeekView/AISchedule";
+import Divider from "@/components/Divider";
+import Calendar from "@/components/Calendar";
 
-export default async function Dashboard() {
+async function page() {
+  const labels = [
+    { name: "Work", color: "bg-red-500" },
+    { name: "Personal", color: "bg-green-500" },
+    { name: "School", color: "bg-blue-500" },
+    { name: "Others", color: "bg-yellow-500" },
+  ];
+
   return (
-    <div className='flex justify-start items-center flex-wrap px-4 pt-4 gap-4'>
-      <Card className='w-[20rem]'>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Welcome
-          </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">100</div>
-          <p className="text-xs text-muted-foreground">
-            Enter your subtitle here
-          </p>
-        </CardContent>
-      </Card>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <BarChartComponent />
-        </CardContent>
-      </Card>
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-10  ">
+        <div className="bg-black p-1 col-span-2  w-full  border-white/80  ">
+          <Divider name="AI Scheduler" />
+          <AISchedule />
+          {/* <Divider name="Calendar" /> */}
+          <Divider name="Labels" />
+          <div className="flex flex-col gap-2">
+            {labels.map((label) => (
+              <div
+                key={label.name}
+                className={`flex items-center gap-2 border-2 border-white ${label.color} p-2 rounded-md`}
+              >
+                <div className="flex  ">
+                  <input
+                    type="checkbox"
+                    className="peer relative appearance-none w-5 h-5 
+                          border rounded-full border-pink-400 
+                          cursor-pointer  
+                          checked:bg-white"
+                    id="circular-checkbox"
+                  />
+
+                  <label className="ms-2 text-sm font-medium ">
+                    {label.name}
+                  </label>
+                </div>
+              </div>
+            ))}
+            <Checkbox />
+          </div>
+        </div>
+        <div className="bg-black p-4 col-span-8 lg:border-r-2">
+          <Calendar />
+        </div>
+      </div>
     </div>
-  )
+  );
 }
+
+export default page;

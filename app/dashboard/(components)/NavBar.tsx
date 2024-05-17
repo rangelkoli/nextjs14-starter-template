@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
@@ -15,14 +16,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Folder, HomeIcon, Settings } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import DashboardNavbar from "./DashboardSideBar";
-import { NavbarTop } from "@/components/navbar-top";
 
-export default function DashboardTopNav({ children }: { children: ReactNode }) {
+const NavBar = () => {
   return (
-    <div className="flex flex-col">
+    <div>
       <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
-        <NavbarTop />
         <Dialog>
           <SheetTrigger className="min-[1024px]:hidden p-2 transition">
             <HamburgerMenuIcon />
@@ -62,10 +60,8 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
               <Separator className="my-3" />
               <DialogClose asChild>
                 <Link href="/dashboard/settings">
-                  <Button variant="outline" className="w-full">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Button>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
                 </Link>
               </DialogClose>
             </div>
@@ -76,7 +72,8 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
           <ModeToggle />
         </div>
       </header>
-      {children}
     </div>
   );
-}
+};
+
+export default NavBar;
