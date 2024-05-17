@@ -1,12 +1,18 @@
+import { set } from "date-fns";
 import { parse } from "path";
-import React from "react";
+import React, { useRef, useState } from "react";
 
 type Event = {
-  title: string;
-  start_time: string;
-  end_time: string;
-  location: string;
-  description: string;
+  date: string;
+  user_id: string;
+  schedule: [
+    {
+      start_time: string;
+      end_time: string;
+      title: string;
+      description: string;
+    }
+  ];
 };
 
 const labelEncoding = {
@@ -48,9 +54,21 @@ export default function DayEvents({
   events,
 }: {
   date: string;
-  events: any[];
+  events: [Event] | null;
 }) {
   console.log("events", events);
+  console.log("eventsSA", events?.[0].schedule);
+  const schdule = useRef<any>(null);
+  const [scheduleEvents, setScheduleEvents] = useState<any>(null);
+  if (events !== null) {
+    const scheduleEvents = events?.[0].schedule;
+    console.log("events", events);
+    setScheduleEvents(scheduleEvents);
+    schdule.current = scheduleEvents;
+  } else {
+    const scheduleEvents = null;
+    console.log("events", events);
+  }
   // events.map((event: Event) => {
   //   const AMPM = event.start_time.split(" ")[1];
   //   if (AMPM === "PM") {
@@ -91,52 +109,97 @@ export default function DayEvents({
       <h1 className=" text-lg font-semibold border-b h-[60px] text-center">
         {date}
       </h1>
-      {events.map((event: Event) => {
+
+      {scheduleEvents?.map(
+        (event: {
+          start_time: string;
+          end_time: string;
+          title: string;
+          description: string;
+        }) => {
+          return (
+            <div
+              key={event.title}
+              className="event w-full text-center  hover:bg-blue-600 group justify-center  "
+              style={{
+                top: `${
+                  parseInt(event.start_time.split(":")[0]) * 60 +
+                  parseInt(event.start_time.split(":")[1]) +
+                  60
+                }px`,
+                height: `${
+                  (parseInt(event.end_time.split(":")[0]) -
+                    parseInt(event.start_time.split(":")[0])) *
+                    60 +
+                  (parseInt(event.end_time.split(":")[1]) -
+                    parseInt(event.start_time.split(":")[1]))
+                }px`,
+                border: "1px solid black",
+                position: "absolute",
+                width: "100%",
+              }}
+            >
+              <p>{event.title}</p>
+              <p>
+                {event.start_time} - {event.end_time}
+              </p>
+            </div>
+          );
+        }
+      )}
+
+      {/* {events?.map((event: Event) => {
         return (
           <div
-            key={event.title}
-            className={`bg-${
-              labelEncoding[event.title as keyof typeof labelEncoding] || ""
-            } w-full  hover:bg-blue-600 group justify-center  
+            className={` w-full  hover:bg-blue-600 group justify-center  
             } bg-red`}
-            style={{
-              top: `${
-                parseInt(event.start_time.split(":")[0]) * 60 +
-                parseInt(event.start_time.split(":")[1]) +
-                60
-              }px`,
-              height: `${
-                (parseInt(event.end_time.split(":")[0]) -
-                  parseInt(event.start_time.split(":")[0])) *
-                  60 +
-                (parseInt(event.end_time.split(":")[1]) -
-                  parseInt(event.start_time.split(":")[1]))
-              }px`,
-              border: "1px solid black",
-              position: "absolute",
-              width: "100%",
-            }}
+            // style={{
+            //   top: `${
+            //     parseInt(event.start_time.split(":")[0]) * 60 +
+            //     parseInt(event.start_time.split(":")[1]) +
+            //     60
+            //   }px`,
+            //   height: `${
+            //     (parseInt(event.end_time.split(":")[0]) -
+            //       parseInt(event.start_time.split(":")[0])) *
+            //       60 +
+            //     (parseInt(event.end_time.split(":")[1]) -
+            //       parseInt(event.start_time.split(":")[1]))
+            //   }px`,
+            //   border: "1px solid black",
+            //   position: "absolute",
+            //   width: "100%",
+            // }}
           >
             <div
-              className={`bg-${
-                labelEncoding[event.title as keyof typeof labelEncoding] || ""
-              } w-full h-full group:hover:bg-blue-600`}
+              // className={`bg-${
+              //   labelEncoding[event.title as keyof typeof labelEncoding] || ""
+              // } w-full h-full group:hover:bg-blue-600`}
+              // style={{
+              //   backgroundColor: `${
+              //     labelEncoding[event.title as keyof typeof labelEncoding]
+              //   }`,
+              // }}
+              className={`
+           w-full h-full group:hover:bg-blue-600`}
               style={{
                 backgroundColor: `${
-                  labelEncoding[event.title as keyof typeof labelEncoding]
+                  labelEncoding[
+                    event.schedule[0].title as keyof typeof labelEncoding
+                  ]
                 }`,
               }}
             >
               <p className=" text-center justify-center align-middle group:hover:hidden text-sm bg-blue">
-                {event.start_time} - {event.end_time}
+                {event.schedule[0].start_time} - {event.schedule[0].end_time}
               </p>
               <p className=" text-center justify-center align-middle h-full group:hover:hidden">
-                {event.title}
+                {event.schedule[0].title}
               </p>
             </div>
           </div>
         );
-      })}
+      })} */}
     </div>
   );
 }

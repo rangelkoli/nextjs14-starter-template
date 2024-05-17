@@ -13,7 +13,21 @@ import { useAuth } from "@clerk/nextjs";
 import CreateEvent from "./create-event";
 import { set } from "date-fns";
 import { A } from "@upstash/redis/zmscore-10fd3773";
-
+import DailySchedule from "./WeekView/DailySchedule";
+import { PassThrough } from "stream";
+interface Event {
+  date: string;
+  id: Number;
+  schedule: [
+    {
+      title: string;
+      start_time: string;
+      end_time: string;
+      location: string;
+      description: string;
+    }
+  ];
+}
 function Calendar() {
   const { userId, getToken } = useAuth();
   const [selectDate, setSelectDate] = useState(todayDate);
@@ -23,11 +37,11 @@ function Calendar() {
     let currentDate = new Date(date);
 
     if (addOrSubtract === "add") {
-      currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+      currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
     } else {
-      currentDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+      currentDate = new Date(currentDate.setDate(currentDate.getDate() - 1));
     }
-    setSelectDate(currentDate.toString().split(" ").slice(1, 4).join(" "));
+    setSelectDate(dayjs(currentDate).format("ddd, MMMM D, YYYY"));
   }
 
   const [mainEvents, setMainEvents] = useState<Array<any>>([]);
@@ -48,75 +62,33 @@ function Calendar() {
     fetchSchedule();
   }, []);
 
-  const events = [
-    {
-      event: "Breakfast and housework",
-      start_time: "08:15 AM",
-      end_time: "09:45 AM",
-      label: "Work",
-    },
-    {
-      event: "Classes",
-      start_time: "10:00 AM",
-      end_time: "12:00 PM",
-      label: "School",
-    },
-    {
-      event: "Lunch and nap",
-      start_time: "12:30 PM",
-      end_time: "02:30 PM",
-      label: "Personal",
-    },
-    {
-      event: "Gym",
-      start_time: "02:30 PM",
-      end_time: "04:00 PM",
-      label: "Personal",
-    },
-    {
-      event: "Make and drink smoothie",
-      start_time: "04:00 PM",
-      end_time: "04:30 PM",
-      label: "Personal",
-    },
-    {
-      event: "Read a book",
-      start_time: "04:30 PM",
-      end_time: "06:00 PM",
-      label: "Personal",
-    },
-    {
-      event: "Cook dinner",
-      start_time: "06:00 PM",
-      end_time: "07:00 PM",
-      label: "Personal",
-    },
-    {
-      event: "Dinner",
-      start_time: "07:00 PM",
-      end_time: "07:40 PM",
-      label: "Personal",
-    },
-    {
-      event: "Walk",
-      start_time: "07:40 PM",
-      end_time: "08:20 PM",
-      label: "Personal",
-    },
-    {
-      event: "Watch reels on Instagram",
-      start_time: "08:20 PM",
-      end_time: "10:45 PM",
-      label: "Personal",
-    },
-    {
-      event: "Sleep",
-      start_time: "11:00 PM",
-      end_time: "08:00 AM",
-      label: "Personal",
-    },
-  ];
   const [createEvent, setCreateEvent] = useState(false);
+
+  function getEventBasedOnDate(date: string, events: any) {
+    const formattedate = dayjs(date).format("YYYY-MM-DD");
+    const filteredEvents: Event = {
+      date: "",
+      id: 0,
+      schedule: [
+        {
+          title: "",
+          start_time: "",
+          end_time: "",
+          location: "",
+          description: "",
+        },
+      ],
+    };
+    events.forEach((event: any) => {
+      if (event.date === formattedate) {
+        filteredEvents.date = event.date;
+        filteredEvents.id = event.id;
+        filteredEvents.schedule = event.schedule;
+      }
+    });
+
+    return filteredEvents.schedule;
+  }
 
   return (
     <div>
@@ -126,6 +98,7 @@ function Calendar() {
             onClick={() => {
               changeDate(selectDate, "subtract", view);
             }}
+            aria-label="Previous Date"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -142,6 +115,7 @@ function Calendar() {
             onClick={() => {
               changeDate(selectDate, "add", view);
             }}
+            aria-label="Next Date"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -158,6 +132,7 @@ function Calendar() {
             setCreateEvent(true);
           }}
           className="bg-blue-500 text-white p-2 rounded-lg"
+          aria-label="Create Event"
         >
           Create Event
         </button>
@@ -175,21 +150,23 @@ function Calendar() {
               <TimingsEvents />
             </div>
             <div className="grid grid-cols-1 grid-flow-col w-full">
-              <DayEvents
+              {/* <DayEvents
                 date={selectDate}
-                events={mainEvents.filter((event) => {
-                  return event.date === selectDate;
-                })}
+                events={getEventBasedOnDate(selectDate, mainEvents)}
+              /> */}
+              <DailySchedule
+                date={selectDate}
+                events={getEventBasedOnDate(selectDate, mainEvents)}
               />
             </div>
           </div>
         </div>
       )}
-      {view === "week" && (
+      {/* {view === "week" && (
         <div>
           <WeeklyOverview date={selectDate} />
         </div>
-      )}
+      )} */}
       {view === "month" && (
         <div>
           <MonthView />
