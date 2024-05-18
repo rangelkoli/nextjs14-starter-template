@@ -111,9 +111,9 @@ function WeeklyOverview({ date }: { date: string }) {
         <TimingsEvents />
       </div>
       <div className="grid grid-cols-7 grid-flow-col w-full">
-        {week.map((day) => (
+        {/* {week.map((day) => (
           <DayEvents key={day} date={day} events={events} />
-        ))}
+        ))} */}
       </div>
     </div>
   );
